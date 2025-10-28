@@ -1,0 +1,14 @@
+F:\empresas\BioSensorsIA\AdultosMayoresCodigo\Test2\bin\Debug\net10.0\Test2.exe
+F:\empresas\BioSensorsIA\AdultosMayoresCodigo\Test2\bin\Debug\net10.0\Test2.deps.json
+F:\empresas\BioSensorsIA\AdultosMayoresCodigo\Test2\bin\Debug\net10.0\Test2.runtimeconfig.json
+F:\empresas\BioSensorsIA\AdultosMayoresCodigo\Test2\bin\Debug\net10.0\Test2.dll
+F:\empresas\BioSensorsIA\AdultosMayoresCodigo\Test2\bin\Debug\net10.0\Test2.pdb
+F:\empresas\BioSensorsIA\AdultosMayoresCodigo\Test2\obj\Debug\net10.0\Test2.GeneratedMSBuildEditorConfig.editorconfig
+F:\empresas\BioSensorsIA\AdultosMayoresCodigo\Test2\obj\Debug\net10.0\Test2.AssemblyInfoInputs.cache
+F:\empresas\BioSensorsIA\AdultosMayoresCodigo\Test2\obj\Debug\net10.0\Test2.AssemblyInfo.cs
+F:\empresas\BioSensorsIA\AdultosMayoresCodigo\Test2\obj\Debug\net10.0\Test2.csproj.CoreCompileInputs.cache
+F:\empresas\BioSensorsIA\AdultosMayoresCodigo\Test2\obj\Debug\net10.0\Test2.dll
+F:\empresas\BioSensorsIA\AdultosMayoresCodigo\Test2\obj\Debug\net10.0\refint\Test2.dll
+F:\empresas\BioSensorsIA\AdultosMayoresCodigo\Test2\obj\Debug\net10.0\Test2.pdb
+F:\empresas\BioSensorsIA\AdultosMayoresCodigo\Test2\obj\Debug\net10.0\Test2.genruntimeconfig.cache
+F:\empresas\BioSensorsIA\AdultosMayoresCodigo\Test2\obj\Debug\net10.0\ref\Test2.dll
