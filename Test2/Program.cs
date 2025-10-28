@@ -9,12 +9,15 @@ namespace SensorDataProcessor
 {
     class Program
     {
+
+        //factor pico para el calculo del umbral minimo de deteccion de picos
         const double FACTOR_PICO = 0.3;
+        //numero de muestras minimo entre picos detectados
         const int FACTOR_DISTANCIA = 35;
 
         static void Main(string[] args)
         {
-            string filePath = "test_2_20251027_113516_proc.txt";
+            string filePath = "test_2_20251027_114217_proc.txt";
             var data = LoadData(filePath);
 
             // PASO 1: Copiar valores filtrados (NO eliminar gravedad)
@@ -49,7 +52,7 @@ namespace SensorDataProcessor
             {
                 ["weinberg"] = new Dictionary<string, object>
                 {
-                    ["K"] = 0.22,
+                    ["K"] = 0.315,
                     ["K_height"] = 0.0003,
                     ["distancia_picos"] = FACTOR_DISTANCIA,
                     ["dt"] = 0.02,
