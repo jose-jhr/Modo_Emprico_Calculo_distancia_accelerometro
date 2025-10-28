@@ -12,3 +12,4 @@ F:\empresas\BioSensorsIA\AdultosMayoresCodigo\Test2\obj\Debug\net10.0\refint\Tes
 F:\empresas\BioSensorsIA\AdultosMayoresCodigo\Test2\obj\Debug\net10.0\Test2.pdb
 F:\empresas\BioSensorsIA\AdultosMayoresCodigo\Test2\obj\Debug\net10.0\Test2.genruntimeconfig.cache
 F:\empresas\BioSensorsIA\AdultosMayoresCodigo\Test2\obj\Debug\net10.0\ref\Test2.dll
+F:\empresas\BioSensorsIA\AdultosMayoresCodigo\Test2\obj\Debug\net10.0\Test2.sourcelink.json
