@@ -1,106 +1,170 @@
-nstalación y Ejecución
+. download https://dotnet.microsoft.com/es-es/download/dotnet/thank-you/sdk-10.0.100-rc.1-windows-x64-installer 2. Ejecutar dotnet new console -n Test1 3. luego ingresar a Test1 y correr dotnet build 4. luego ejecutar dotnet run
 
-Descargar .NET SDK 10.0.100 RC1
-Descargar aquí
+1. download https://dotnet.microsoft.com/es-es/download/dotnet/thank-you/sdk-10.0.100-rc.1-windows-x64-installer
+2. Ejecutar dotnet new console -n Test1
 
-Crear un nuevo proyecto de consola:
+3. luego ingresar a Test1 y correr dotnet build
 
-dotnet new console -n Test1
+4. luego ejecutar dotnet run
 
-Ingresar a la carpeta del proyecto y compilar:
+Resultados, fijarse en la ultima distancia recorrida no en la primera para visualizarle correctamente.
 
-cd Test1
-dotnet build
+========================================================================================================================
+RESULTADOS PARA METODO: WEINBERG 4 metros
+========================================================================================================================
 
-Ejecutar el programa:
+Sensor: Tobillo D
 
-dotnet run
+Distancia recorrida (m): 2.03
 
-Nota: Fíjate en la última distancia recorrida para visualizar correctamente los resultados.
+Tiempo (s): 6.36
 
-RESULTADOS
-MÉTODO: WEINBERG (4 metros)
-Sensor: Tobillo Derecho
+Puntuacion (0-4): 0
 
-Distancia recorrida: 2.03 m
+Puntuacion custom: 0.00
 
-Tiempo: 6.36 s
+Completado: -
 
-Frecuencia: 0.63 Hz
+Frecuencia (Hz): 0.63
 
-Cadencia: 76 ppm
-
-Pasos: 4
-
-ROM x Pasos: [0.49, 0.51, 0.52, 0.51]
-→ Distancia Acumulada: 2.03 m
-
-Sensor: Tobillo Izquierdo
-
-Distancia recorrida: 2.04 m
-
-Tiempo: 7.06 s
-
-Frecuencia: 0.57 Hz
-
-Cadencia: 68 ppm
+Cadencia (ppm): 76
 
 Pasos: 4
 
-ROM x Pasos: [0.52, 0.51, 0.52, 0.48]
-→ Distancia Acumulada: 4.07 m
+Tiempo medio paso (s): 0.80
 
-Sensor: Dorsal
+Altura pasos (cm): [137878.26, 156550.01, 152237.49, 176711.91]
 
-Distancia recorrida: 3.02 m
+Array Rom x Pasos (metros): [0.49, 0.51, 0.52, 0.51]
 
-Tiempo: 7.22 s
+Distancia Acumulada: 2.03
 
-Frecuencia: 0.97 Hz
+Sensor: Tobillo I
 
-Cadencia: 116 ppm
+Distancia recorrida (m): 2.04
+
+Tiempo (s): 7.06
+
+Puntuacion (0-4): 0
+
+Puntuacion custom: 0.00
+Completado: -
+
+Frecuencia (Hz): 0.57
+
+Cadencia (ppm): 68
+Pasos: 4
+
+Tiempo medio paso (s): 0.88
+
+Altura pasos (cm): [155470.59, 160064.95, 186055.86, 106833.78]
+
+Array Rom x Pasos (metros): [0.52, 0.51, 0.52, 0.48]
+
+Distancia Acumulada: 4.07
+
+Sensor: Sensor Dorsal
+
+Distancia recorrida (m): 3.02
+
+Tiempo (s): 7.22
+
+Puntuacion (0-4): 0
+
+Puntuacion custom: 0.00
+
+Completado: -
+
+Frecuencia (Hz): 0.97
+
+Cadencia (ppm): 116
 
 Pasos: 7
 
-ROM x Pasos: [0.47, 0.45, 0.39, 0.39, 0.37, 0.40, 0.55]
-→ Distancia Acumulada: NaN
+Tiempo medio paso (s): 0.52
 
-MÉTODO: ADAPTIVE (4 metros)
-Sensor: Tobillo Derecho
+Altura pasos (cm): [160604.38, 131425.11, 43770.60, 51049.34, 38460.29, 54192.44, 11452020.17]
 
-Distancia recorrida: 2.28 m
+Array Rom x Pasos (metros): [0.47, 0.45, 0.39, 0.39, 0.37, 0.40, 0.55]
 
-Frecuencia: 0.63 Hz
+Distancia Acumulada: NaN
 
-Cadencia: 76 ppm
+========================================================================================================================
+RESULTADOS PARA METODO: ADAPTIVE 4 metros
+========================================================================================================================
+
+Sensor: Tobillo D
+
+Distancia recorrida (m): 2.28
+
+Puntuacion (0-4): 0
+
+Puntuacion custom: 0.00
+
+Completado: -
+
+Frecuencia (Hz): 0.63
+
+Cadencia (ppm): 76
 
 Pasos: 4
 
-ROM x Pasos: [0.50, 0.58, 0.58, 0.62]
-→ Distancia Acumulada: 2.28 m
+Tiempo medio paso (s): 0.80
 
-Sensor: Tobillo Izquierdo
+Altura pasos (cm): [133730.71, 146371.92, 152740.01, 171763.29]
 
-Distancia recorrida: 2.19 m
+Array Rom x Pasos (metros): [0.50, 0.58, 0.58, 0.62]
 
-Frecuencia: 0.57 Hz
+Distancia Acumulada: 2.28
 
-Cadencia: 68 ppm
+Sensor: Tobillo I
+
+Distancia recorrida (m): 2.19
+
+Tiempo (s): 7.06
+
+Puntuacion (0-4): 0
+
+Puntuacion custom: 0.00
+
+Completado: -
+
+Frecuencia (Hz): 0.57
+
+Cadencia (ppm): 68
 
 Pasos: 4
 
-ROM x Pasos: [0.58, 0.56, 0.60, 0.46]
-→ Distancia Acumulada: 4.47 m
+Tiempo medio paso (s): 0.88
 
-Sensor: Dorsal
+Altura pasos (cm): [150397.73, 161262.61, 181641.67, 115485.55]
 
-Distancia recorrida: 2.32 m
+Array Rom x Pasos (metros): [0.58, 0.56, 0.60, 0.46]
 
-Frecuencia: 0.93 Hz
+Distancia Acumulada: 4.47
 
-Cadencia: 112 ppm
+Sensor: Sensor Dorsal
+
+Distancia recorrida (m): 2.32
+
+Tiempo (s): 7.50
+
+Puntuacion (0-4): 0
+
+Puntuacion custom: 0.00
+
+Completado: -
+
+Frecuencia (Hz): 0.93
+
+Cadencia (ppm): 112
 
 Pasos: 7
 
-ROM x Pasos: [0.34, 0.29, 0.32, 0.30, 0.30, 0.31, 0.45]
-→ Distancia Acumulada: NaN
+Tiempo medio paso (s): 0.54
+
+Altura pasos (cm): [56061.55, 41557.99, 42952.87, 49049.04, 35538.92, 52551.41, 12845373.98]
+
+Array Rom x Pasos (metros): [0.34, 0.29, 0.32, 0.30, 0.30, 0.31, 0.45]
+
+Distancia Acumulada: NaN
