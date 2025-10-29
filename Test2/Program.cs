@@ -17,7 +17,7 @@ namespace SensorDataProcessor
 
         static void Main(string[] args)
         {
-            string filePath = "test_2_20251027_114217_proc.txt";
+            string filePath = "test_2_20251027_113516_proc.txt";
             var data = LoadData(filePath);
 
             // PASO 1: Copiar valores filtrados (NO eliminar gravedad)
@@ -53,7 +53,9 @@ namespace SensorDataProcessor
                 ["weinberg"] = new Dictionary<string, object>
                 {
                     ["K"] = 0.315,
-                    ["K_height"] = 0.0003,
+                    //revisar bien este valor es muy bajo, pero se tiene que ajustar para que de valores cercanos a un valor ideal, se
+                    //tiene que realizar mas pruebas, en donde se estime la altura del paso con el fin de idealizar este valor de altura
+                    ["K_height"] = 0.000000005,
                     ["distancia_picos"] = FACTOR_DISTANCIA,
                     ["dt"] = 0.02,
                     ["alpha"] = 0.1,
@@ -83,7 +85,9 @@ namespace SensorDataProcessor
                 ["adaptive"] = new Dictionary<string, object>
                 {
                     ["K"] = 0.22,
-                    ["K_height"] = 0.0003,
+                    //revisar bien este valor es muy bajo, pero se tiene que ajustar para que de valores cercanos a un valor ideal, se
+                    //tiene que realizar mas pruebas, en donde se estime la altura del paso con el fin de idealizar este valor de altura
+                    ["K_height"] = 0.000000005,
                     ["distancia_picos"] = FACTOR_DISTANCIA,
                     ["dt"] = 0.02,
                     ["alpha"] = 0.1,
@@ -531,6 +535,7 @@ namespace SensorDataProcessor
                     TiempoMedioPaso = 0.0
                 };
 
+            Console.Write("picos encontrados: " + peaks.Count);
             // Procesar cada paso
             var stepData = new List<StepInfo>();
             foreach (var p in peaks)
