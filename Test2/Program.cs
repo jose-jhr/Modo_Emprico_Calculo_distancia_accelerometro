@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using System.Globalization;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace SensorDataProcessor
 {
@@ -17,8 +18,15 @@ namespace SensorDataProcessor
 
         static void Main(string[] args)
         {
-            string filePath = "test_2_20251027_113516_proc.txt";
+            //string filePath = "testG4Vic_20251030_123954_proc.txt";
+            //string filePath = "T2vic_20251030_102144_proc.txt";
+            string filePath = "test_2_sujeto_0_173cm_marchabuena_20251029_140729_proc.txt";
+            //string filePath = "test_2_20251027_114217_proc.txt";
+            //string filePath = "test_2_20251027_113516_proc.txt";
+
             var data = LoadData(filePath);
+
+            data = data.Where(d => d.Id == 1).ToList();
 
             // PASO 1: Copiar valores filtrados (NO eliminar gravedad)
             foreach (var d in data)
@@ -90,8 +98,8 @@ namespace SensorDataProcessor
                     ["K_height"] = 0.000000005,
                     ["distancia_picos"] = FACTOR_DISTANCIA,
                     ["dt"] = 0.02,
-                    ["alpha"] = 0.1,
-                    ["beta"] = 0.23,
+                    ["alpha"] = 0.57,
+                    ["beta"] = 0.17,
                     ["use_fft"] = true
                 }
             };
@@ -119,6 +127,8 @@ namespace SensorDataProcessor
                 {
                     // Crear copia del dataset
                     var dfSensorCopy = CopiarDataset(dfSensor);
+
+                    Console.WriteLine("Sensor usado" + nombre);
 
                     // en caso de ser necesario invertir eje Z
                     // if (nombre.Contains("I"))
@@ -363,7 +373,18 @@ namespace SensorDataProcessor
         static double AdaptiveStepLength(double accMax, double accMin, double velocity, double alpha = 0.1, double beta = 0.4)
         {
             double K = alpha * velocity + beta;
+            //double K = 0.68 - alpha * velocity + beta * Math.Pow(velocity, 2);
             return K * Math.Pow(accMax - accMin, 0.25);
+        }
+
+
+        static double EstimateStepHeightFromLength(double stepLength, double height)
+        {
+            //longitud promedio de la pierna respecto a la altura, 0.53 altura total son las piernas
+            double legLength = 0.53 * height; // relación antropométrica promedio
+            double ratio = stepLength / (2.0 * legLength);
+            ratio = Math.Min(1.0, ratio);     // evitar sqrt negativa
+            return legLength * (1.0 - Math.Sqrt(1.0 - ratio * ratio));
         }
 
         static double[] SmoothWithFft(double[] signal, double threshold = 0.1)
@@ -606,6 +627,8 @@ namespace SensorDataProcessor
                 }
 
                 totalDistance += stepLength;
+                var altura_paso = EstimateStepHeightFromLength(stepLength, 1.80);
+                Console.WriteLine("Altura paso: " + altura_paso);
                 arrayRomPasos.Add(stepLength);
                 stepHeights.Add(step.StepHeight);
             }
