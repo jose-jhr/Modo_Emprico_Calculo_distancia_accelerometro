@@ -486,7 +486,7 @@ namespace SensorDataProcessor
             double alphaOptimo = alpha;
             double betaOptimo = beta;
 
-            for (int iteracion = 0; iteracion < 340; iteracion++)
+            for (int iteracion = 0; iteracion < 30; iteracion++)
             {
                 double KMid = (KMin + KMax) / 2.0;
                 double alphaMid = alphaOptimo;
