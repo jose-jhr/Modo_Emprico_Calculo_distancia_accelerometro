@@ -4,28 +4,20 @@ using System.Linq;
 using System.Numerics;
 using System.Globalization;
 using System.IO;
-using System.Text.RegularExpressions;
 
 namespace SensorDataProcessor
 {
     class Program
     {
-
-        //factor pico para el calculo del umbral minimo de deteccion de picos
+        // Factor pico para el cálculo del umbral mínimo de detección de picos
         const double FACTOR_PICO = 0.3;
-        //numero de muestras minimo entre picos detectados
+        // Número de muestras mínimo entre picos detectados
         const int FACTOR_DISTANCIA = 35;
 
         static void Main(string[] args)
         {
-            //string filePath = "testG4Vic_20251030_123954_proc.txt";
-            //string filePath = "T2vic_20251030_102144_proc.txt";
-            string filePath = "test_2_sujeto_0_173cm_marchabuena_20251029_140729_proc.txt";
-            //string filePath = "test_2_20251027_114217_proc.txt";
-            //string filePath = "test_2_20251027_113516_proc.txt";
-
+            string filePath = "test_2_20251027_114217_proc.txt";
             var data = LoadData(filePath);
-
             data = data.Where(d => d.Id == 1).ToList();
 
             // PASO 1: Copiar valores filtrados (NO eliminar gravedad)
@@ -47,7 +39,7 @@ namespace SensorDataProcessor
             var df3 = dfFiltrado.Where(d => d.Canal == "Mov").ToList();
             var df4 = dfFiltrado.Where(d => d.Canal == "Wrist").ToList();
 
-            // Configuración
+            // Configuración de bandas y parámetros
             var bandas = new List<(double, double, int)>
             {
                 (0.0, 4.82, 4),
@@ -55,35 +47,12 @@ namespace SensorDataProcessor
                 (8.7, double.PositiveInfinity, 1)
             };
 
-            // Parámetros por método
             var parametrosPorMetodo = new Dictionary<string, Dictionary<string, object>>
             {
                 ["weinberg"] = new Dictionary<string, object>
                 {
                     ["K"] = 0.315,
-                    //revisar bien este valor es muy bajo, pero se tiene que ajustar para que de valores cercanos a un valor ideal, se
-                    //tiene que realizar mas pruebas, en donde se estime la altura del paso con el fin de idealizar este valor de altura
                     ["K_height"] = 0.000000005,
-                    ["distancia_picos"] = FACTOR_DISTANCIA,
-                    ["dt"] = 0.02,
-                    ["alpha"] = 0.1,
-                    ["beta"] = 0.4,
-                    ["use_fft"] = false
-                },
-                ["kim"] = new Dictionary<string, object>
-                {
-                    ["K"] = 0.12,
-                    ["K_height"] = 0.0003,
-                    ["distancia_picos"] = FACTOR_DISTANCIA,
-                    ["dt"] = 0.02,
-                    ["alpha"] = 0.1,
-                    ["beta"] = 0.4,
-                    ["use_fft"] = false
-                },
-                ["scarlet"] = new Dictionary<string, object>
-                {
-                    ["K"] = 0.1,
-                    ["K_height"] = 0.0003,
                     ["distancia_picos"] = FACTOR_DISTANCIA,
                     ["dt"] = 0.02,
                     ["alpha"] = 0.1,
@@ -93,8 +62,6 @@ namespace SensorDataProcessor
                 ["adaptive"] = new Dictionary<string, object>
                 {
                     ["K"] = 0.22,
-                    //revisar bien este valor es muy bajo, pero se tiene que ajustar para que de valores cercanos a un valor ideal, se
-                    //tiene que realizar mas pruebas, en donde se estime la altura del paso con el fin de idealizar este valor de altura
                     ["K_height"] = 0.000000005,
                     ["distancia_picos"] = FACTOR_DISTANCIA,
                     ["dt"] = 0.02,
@@ -103,7 +70,6 @@ namespace SensorDataProcessor
                     ["use_fft"] = true
                 }
             };
-            //var metodos = new[] { "weinberg", "kim", "scarlet", "adaptive" };
 
             var metodos = new[] { "weinberg", "adaptive" };
             var sensores = new[]
@@ -113,34 +79,22 @@ namespace SensorDataProcessor
                 ("Sensor Dorsal", df4)
             };
 
-            // Ejecutar todos los métodos
             foreach (var method in metodos)
             {
                 Console.WriteLine();
                 Console.WriteLine(new string('=', 120));
                 Console.WriteLine($"RESULTADOS PARA METODO: {method.ToUpper()} 4 metros");
                 Console.WriteLine(new string('=', 120));
-
                 double distanciaAcumulada = 0.0;
 
                 foreach (var (nombre, dfSensor) in sensores)
                 {
-                    // Crear copia del dataset
                     var dfSensorCopy = CopiarDataset(dfSensor);
-
-                    Console.WriteLine("Sensor usado" + nombre);
-
-                    // en caso de ser necesario invertir eje Z
-                    // if (nombre.Contains("I"))
-                    // {
-                    //     foreach (var d in dfSensorCopy)
-                    //         d.LinAccZRaw *= -1;  // Invierte Z, pero usa X
-                    // }
-
+                    Console.WriteLine("Sensor usado: " + nombre);
                     var parametros = parametrosPorMetodo[method];
                     var result = CalcularTiempoYScore3(
                         dfSensorCopy,
-                        4.0,
+                        2.0,
                         "X",
                         bandas,
                         method,
@@ -154,11 +108,8 @@ namespace SensorDataProcessor
                     );
 
                     double distanciaRecorrida = result.DistanciaRecorrida;
-
                     if (nombre != "Sensor Dorsal")
-                    {
                         distanciaAcumulada += distanciaRecorrida;
-                    }
 
                     // Imprimir resultado del sensor
                     Console.WriteLine();
@@ -187,18 +138,11 @@ namespace SensorDataProcessor
                     }
 
                     if (nombre != "Sensor Dorsal")
-                    {
                         Console.WriteLine($"  Distancia Acumulada: {distanciaAcumulada:F2}");
-                    }
                     else
-                    {
                         Console.WriteLine($"  Distancia Acumulada: NaN");
-                    }
                 }
             }
-
-            Console.WriteLine();
-            Console.WriteLine(new string('=', 120));
         }
 
         static List<SensorData> CopiarDataset(List<SensorData> original)
@@ -247,7 +191,6 @@ namespace SensorDataProcessor
                     if (string.IsNullOrWhiteSpace(line)) continue;
                     var values = line.Split(';');
                     if (values.Length < 24) continue;
-
                     data.Add(new SensorData
                     {
                         Time = values[0],
@@ -285,33 +228,21 @@ namespace SensorDataProcessor
             return double.Parse(value.Replace(",", "."), CultureInfo.InvariantCulture);
         }
 
-        // Deteccion de picos usando scipy.signal.find_peaks
         static List<int> FindPeaksScipyStyle(double[] x, double? height = null, int? distance = null)
         {
             var peaks = new List<int>();
             int n = x.Length;
-
-            // Encontrar todos los máximos locales
             for (int i = 1; i < n - 1; i++)
             {
                 if (x[i] > x[i - 1] && x[i] > x[i + 1])
-                {
                     peaks.Add(i);
-                }
             }
-
-            // Filtrar por altura
             if (height.HasValue)
-            {
                 peaks = peaks.Where(i => x[i] >= height.Value).ToList();
-            }
-
-            // Filtrar por distancia eliminar picos muy cercanos, mantener el mas alto
             if (distance.HasValue && peaks.Count > 1)
             {
                 var filteredPeaks = new List<int>();
                 int lastPeak = -distance.Value - 1;
-
                 foreach (var peak in peaks)
                 {
                     if (peak - lastPeak >= distance.Value)
@@ -319,19 +250,14 @@ namespace SensorDataProcessor
                         filteredPeaks.Add(peak);
                         lastPeak = peak;
                     }
-                    else
+                    else if (x[peak] > x[filteredPeaks.Last()])
                     {
-                        // Mantener el pico mas alto entre los cercanos
-                        if (x[peak] > x[filteredPeaks.Last()])
-                        {
-                            filteredPeaks[filteredPeaks.Count - 1] = peak;
-                            lastPeak = peak;
-                        }
+                        filteredPeaks[filteredPeaks.Count - 1] = peak;
+                        lastPeak = peak;
                     }
                 }
                 peaks = filteredPeaks;
             }
-
             return peaks;
         }
 
@@ -350,67 +276,69 @@ namespace SensorDataProcessor
             return K * accValues.Average(a => Math.Abs(a));
         }
 
-        static double CalculateStepHeight(double accMax, double accMin, double stepTime, double KHeight = 0.001)
+        static double CalculateStepHeight(double accMax, double accMin, double stepTime, double? KHeight = null)
         {
             double accAmplitude = accMax - accMin;
-            return KHeight * accAmplitude * Math.Pow(stepTime, 2);
+
+            double kHeightValue;
+            if (KHeight == null)
+            {
+                // Factor ajustado para obtener altura en cm
+                kHeightValue = 100 * (0.00001 + (accAmplitude / 100.0) * 0.001);
+            }
+            else
+            {
+                kHeightValue = KHeight.Value;
+            }
+
+            // Altura en cm
+            double height = kHeightValue * accAmplitude * Math.Pow(stepTime, 2);
+            return height;
         }
+
 
         static double CalculateStepVelocity(List<SensorData> df, int peakIdx, int valleyIdx, double dt = 0.02)
         {
             int start = Math.Max(0, valleyIdx - 10);
             int end = Math.Min(df.Count - 1, peakIdx + 10);
             double[] accSegment = df.Skip(start).Take(end - start).Select(d => d.LinAccYRaw).ToArray();
-
-            // Integracion acumulativa np.cumsum
             double[] velocity = new double[accSegment.Length];
             for (int i = 1; i < accSegment.Length; i++)
                 velocity[i] = velocity[i - 1] + accSegment[i] * dt;
-
             return velocity.Average(v => Math.Abs(v));
         }
 
         static double AdaptiveStepLength(double accMax, double accMin, double velocity, double alpha = 0.1, double beta = 0.4)
         {
             double K = alpha * velocity + beta;
-            //double K = 0.68 - alpha * velocity + beta * Math.Pow(velocity, 2);
             return K * Math.Pow(accMax - accMin, 0.25);
         }
 
-
         static double EstimateStepHeightFromLength(double stepLength, double height)
         {
-            //longitud promedio de la pierna respecto a la altura, 0.53 altura total son las piernas
-            double legLength = 0.53 * height; // relación antropométrica promedio
+            double legLength = 0.53 * height;
             double ratio = stepLength / (2.0 * legLength);
-            ratio = Math.Min(1.0, ratio);     // evitar sqrt negativa
+            ratio = Math.Min(1.0, ratio);
             return legLength * (1.0 - Math.Sqrt(1.0 - ratio * ratio));
         }
 
         static double[] SmoothWithFft(double[] signal, double threshold = 0.1)
         {
             int n = signal.Length;
-
             Complex[] fftSignal = new Complex[n];
             for (int i = 0; i < n; i++)
                 fftSignal[i] = new Complex(signal[i], 0);
-
             FFT(fftSignal, false);
-
-            // np.fft.fftfreq genera frecuencias normalizadas
             for (int i = 0; i < n; i++)
             {
                 double freq = (i <= n / 2) ? (double)i / n : (double)(i - n) / n;
                 if (Math.Abs(freq) > threshold)
                     fftSignal[i] = Complex.Zero;
             }
-
             FFT(fftSignal, true);
-
             double[] smoothed = new double[n];
             for (int i = 0; i < n; i++)
                 smoothed[i] = fftSignal[i].Real;
-
             return smoothed;
         }
 
@@ -418,8 +346,6 @@ namespace SensorDataProcessor
         {
             int n = data.Length;
             if (n <= 1) return;
-
-            // Bit reversal
             int j = 0;
             for (int i = 0; i < n - 1; i++)
             {
@@ -437,13 +363,10 @@ namespace SensorDataProcessor
                 }
                 j += k;
             }
-
-            // FFT
             for (int len = 2; len <= n; len *= 2)
             {
                 double angle = (inverse ? 2 : -2) * Math.PI / len;
                 Complex wlen = new Complex(Math.Cos(angle), Math.Sin(angle));
-
                 for (int i = 0; i < n; i += len)
                 {
                     Complex w = Complex.One;
@@ -457,7 +380,6 @@ namespace SensorDataProcessor
                     }
                 }
             }
-
             if (inverse)
             {
                 for (int i = 0; i < n; i++)
@@ -465,35 +387,9 @@ namespace SensorDataProcessor
             }
         }
 
-        class StepInfo
-        {
-            public double AccMax { get; set; }
-            public double AccMin { get; set; }
-            public double[] AccValues { get; set; }
-            public double StepTime { get; set; }
-            public double StepHeight { get; set; }
-            public int EndIdx { get; set; }
-        }
-
-        class ResultadoCalculo
-        {
-            public double DistanciaRecorrida { get; set; }
-            public double Tiempo { get; set; }
-            public int Puntuacion04 { get; set; }
-            public double PuntuacionCustom { get; set; }
-            public bool Completado { get; set; }
-            public double[] AlturaPasos { get; set; }
-            public double DuracionEjercicio { get; set; }
-            public List<double> ArrayRomPasos { get; set; }
-            public int Pasos { get; set; }
-            public double Frecuencia { get; set; }
-            public double Cadencia { get; set; }
-            public double TiempoMedioPaso { get; set; }
-        }
-
         static ResultadoCalculo CalcularTiempoYScore3(
             List<SensorData> dfFiltrado,
-            double distanciaObjetivo = 1.6,
+            double distanciaObjetivo = 2,
             string eje = "X",
             List<(double, double, int)> bandas = null,
             string method = "adaptive",
@@ -526,7 +422,7 @@ namespace SensorDataProcessor
             double[] signal = dfFiltrado.Select(d => d.LinAccXRaw).ToArray();
             int originalLength = signal.Length;
 
-            // Aplicar FFT si esta habilitado
+            // Aplicar FFT si está habilitado
             if (useFft)
             {
                 int nextPow2 = (int)Math.Pow(2, Math.Ceiling(Math.Log(signal.Length, 2)));
@@ -535,10 +431,9 @@ namespace SensorDataProcessor
                 Array.Resize(ref signal, originalLength);
             }
 
-            // Detectar picos usando scipy style
+            // Detectar picos
             double alturaMinima = FACTOR_PICO * signal.Max();
             var peaks = FindPeaksScipyStyle(signal, alturaMinima, distanciaPicos);
-
             if (peaks.Count == 0)
                 return new ResultadoCalculo
                 {
@@ -556,7 +451,6 @@ namespace SensorDataProcessor
                     TiempoMedioPaso = 0.0
                 };
 
-            Console.Write("picos encontrados: " + peaks.Count);
             // Procesar cada paso
             var stepData = new List<StepInfo>();
             foreach (var p in peaks)
@@ -564,17 +458,16 @@ namespace SensorDataProcessor
                 int start = Math.Max(0, p - 20);
                 while (start > 1 && signal[start] > signal[start - 1])
                     start--;
-
                 int end = Math.Min(signal.Length - 1, p + 20);
                 while (end < signal.Length - 2 && signal[end] > signal[end + 1])
                     end++;
-
                 double accMax = signal[p];
                 double accMin = Math.Min(signal[start], signal[end]);
                 double[] accValues = signal.Skip(start).Take(end - start + 1).ToArray();
-                double stepTime = dfFiltrado[end].Timespan - dfFiltrado[start].Timespan;
-                double stepHeight = CalculateStepHeight(accMax, accMin, stepTime, KHeight);
+                double stepTime = (end - start) * dt;
 
+                //double stepTime = dfFiltrado[end].Timespan - dfFiltrado[start].Timespan;
+                double stepHeight = CalculateStepHeight(accMax, accMin, stepTime, null);
                 stepData.Add(new StepInfo
                 {
                     AccMax = accMax,
@@ -586,59 +479,113 @@ namespace SensorDataProcessor
                 });
             }
 
-            // Metricas temporales
+            // Ajuste con búsqueda binaria para K
+            double KMin = K * 0.1;
+            double KMax = K * 5.0;
+            double KOptimo = K;
+            double alphaOptimo = alpha;
+            double betaOptimo = beta;
+
+            for (int iteracion = 0; iteracion < 340; iteracion++)
+            {
+                double KMid = (KMin + KMax) / 2.0;
+                double alphaMid = alphaOptimo;
+                double betaMid = betaOptimo;
+
+                if (method == "adaptive")
+                {
+                    double ratio = KMid / K;
+                    alphaMid = alpha * ratio;
+                    betaMid = beta * ratio;
+                }
+
+                double totalDistance = 0.0;
+                foreach (var step in stepData)
+                {
+                    double stepLength;
+                    switch (method)
+                    {
+                        case "weinberg":
+                            stepLength = WeinbergStepLength(step.AccMax, step.AccMin, KMid);
+                            break;
+                        case "kim":
+                            stepLength = KimStepLength(step.AccMax, step.AccMin, KMid);
+                            break;
+                        case "scarlet":
+                            stepLength = ScarletStepLength(step.AccValues, KMid);
+                            break;
+                        case "adaptive":
+                            double velocity = CalculateStepVelocity(dfFiltrado, step.EndIdx, step.EndIdx - 10, dt);
+                            stepLength = AdaptiveStepLength(step.AccMax, step.AccMin, velocity, alphaMid, betaMid);
+                            break;
+                        default:
+                            stepLength = WeinbergStepLength(step.AccMax, step.AccMin, KMid);
+                            break;
+                    }
+                    totalDistance += stepLength;
+                }
+
+                if (Math.Abs(totalDistance - distanciaObjetivo) < 0.04)
+                {
+                    KOptimo = KMid;
+                    alphaOptimo = alphaMid;
+                    betaOptimo = betaMid;
+                    break;
+                }
+
+                if (totalDistance < distanciaObjetivo)
+                    KMin = KMid;
+                else
+                    KMax = KMid;
+
+                KOptimo = KMid;
+                alphaOptimo = alphaMid;
+                betaOptimo = betaMid;
+            }
+
+            // Calcular resultados finales con K óptimo
+            double totalDistanceFinal = 0.0;
+            var stepHeights = new List<double>();
+            var arrayRomPasos = new List<double>();
+            foreach (var step in stepData)
+            {
+                double stepLength;
+                switch (method)
+                {
+                    case "weinberg":
+                        stepLength = WeinbergStepLength(step.AccMax, step.AccMin, KOptimo);
+                        break;
+                    case "kim":
+                        stepLength = KimStepLength(step.AccMax, step.AccMin, KOptimo);
+                        break;
+                    case "scarlet":
+                        stepLength = ScarletStepLength(step.AccValues, KOptimo);
+                        break;
+                    case "adaptive":
+                        double velocity = CalculateStepVelocity(dfFiltrado, step.EndIdx, step.EndIdx - 10, dt);
+                        stepLength = AdaptiveStepLength(step.AccMax, step.AccMin, velocity, alphaOptimo, betaOptimo);
+                        break;
+                    default:
+                        stepLength = WeinbergStepLength(step.AccMax, step.AccMin, KOptimo);
+                        break;
+                }
+                totalDistanceFinal += stepLength;
+                arrayRomPasos.Add(stepLength);
+                stepHeights.Add(step.StepHeight);
+            }
+
+            // Métricas temporales
             int pasos = peaks.Count;
             double tiempoTotal = pasos > 0 ? stepData.Last().EndIdx * dt : 0.0;
             double frecuenciaHz = tiempoTotal > 0 ? pasos / tiempoTotal : 0.0;
             double cadenciaPpm = frecuenciaHz * 60 * 2;
             double tiempoMedioPaso = pasos > 0 ? (tiempoTotal / pasos) / 2 : 0.0;
 
-            // Distancia total
-            double totalDistance = 0.0;
-            var stepHeights = new List<double>();
-            var arrayRomPasos = new List<double>();
-
-            foreach (var step in stepData)
-            {
-                double stepLength;
-
-                switch (method)
-                {
-                    /**
-                    * Por ahora no usare lo que es kim ni scarlet
-                    * ya que no aportan mejoras significativas sobre weinberg y el metodo adaptativo
-                    */
-                    case "weinberg":
-                        stepLength = WeinbergStepLength(step.AccMax, step.AccMin, K);
-                        break;
-                    case "kim":
-                        stepLength = KimStepLength(step.AccMax, step.AccMin, K);
-                        break;
-                    case "scarlet":
-                        stepLength = ScarletStepLength(step.AccValues, K);
-                        break;
-                    case "adaptive":
-                        double velocity = CalculateStepVelocity(dfFiltrado, step.EndIdx, step.EndIdx - 10, dt);
-                        stepLength = AdaptiveStepLength(step.AccMax, step.AccMin, velocity, alpha, beta);
-                        break;
-                    default:
-                        stepLength = WeinbergStepLength(step.AccMax, step.AccMin, K);
-                        break;
-                }
-
-                totalDistance += stepLength;
-                var altura_paso = EstimateStepHeightFromLength(stepLength, 1.80);
-                Console.WriteLine("Altura paso: " + altura_paso);
-                arrayRomPasos.Add(stepLength);
-                stepHeights.Add(step.StepHeight);
-            }
-
             // Puntuación
             double exerciseDuration = stepData.Sum(s => s.StepTime);
-            bool completado = totalDistance >= distanciaObjetivo;
+            bool completado = totalDistanceFinal >= distanciaObjetivo;
             int score04 = 0;
             double scoreCustom = 0.0;
-
             if (bandas != null && completado)
             {
                 double tiempoUsado = exerciseDuration;
@@ -654,10 +601,9 @@ namespace SensorDataProcessor
             }
 
             double[] stepHeightsArray = stepHeights.Select(h => Math.Round(h * 100, 2)).ToArray();
-
             return new ResultadoCalculo
             {
-                DistanciaRecorrida = Math.Round(totalDistance, 2),
+                DistanciaRecorrida = Math.Round(totalDistanceFinal, 2),
                 Tiempo = Math.Round(tiempoTotal, 2),
                 Puntuacion04 = score04,
                 PuntuacionCustom = Math.Round(scoreCustom, 3),
@@ -676,9 +622,7 @@ namespace SensorDataProcessor
         {
             if (bandas == null || !double.IsFinite(timeS))
                 return 0.0;
-
             bandas = bandas.OrderBy(b => b.Item2).ToList();
-
             for (int i = 0; i < bandas.Count; i++)
             {
                 var (low, high, pHi) = bandas[i];
@@ -686,7 +630,6 @@ namespace SensorDataProcessor
                 {
                     if (i == bandas.Count - 1 || !double.IsFinite(high))
                         return Math.Clamp(pHi, 0.0, 4.0);
-
                     var (_, _, pNext) = bandas[i + 1];
                     double denom = Math.Max(high - low, 1e-9);
                     double alpha2 = (high - timeS) / denom;
@@ -694,9 +637,34 @@ namespace SensorDataProcessor
                     return Math.Clamp(s, 0.0, 4.0);
                 }
             }
-
             return Math.Clamp(bandas.Last().Item3, 0.0, 4.0);
         }
+    }
+
+    class StepInfo
+    {
+        public double AccMax { get; set; }
+        public double AccMin { get; set; }
+        public double[] AccValues { get; set; }
+        public double StepTime { get; set; }
+        public double StepHeight { get; set; }
+        public int EndIdx { get; set; }
+    }
+
+    class ResultadoCalculo
+    {
+        public double DistanciaRecorrida { get; set; }
+        public double Tiempo { get; set; }
+        public int Puntuacion04 { get; set; }
+        public double PuntuacionCustom { get; set; }
+        public bool Completado { get; set; }
+        public double[] AlturaPasos { get; set; }
+        public double DuracionEjercicio { get; set; }
+        public List<double> ArrayRomPasos { get; set; }
+        public int Pasos { get; set; }
+        public double Frecuencia { get; set; }
+        public double Cadencia { get; set; }
+        public double TiempoMedioPaso { get; set; }
     }
 
     class SensorData
