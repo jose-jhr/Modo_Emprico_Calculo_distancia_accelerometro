@@ -52,7 +52,7 @@ namespace SensorDataProcessor
                 ["weinberg"] = new Dictionary<string, object>
                 {
                     ["K"] = 0.315,
-                    ["K_height"] = 0.000000005,
+                    ["K_height"] = 0.5,
                     ["distancia_picos"] = FACTOR_DISTANCIA,
                     ["dt"] = 0.02,
                     ["alpha"] = 0.1,
@@ -62,7 +62,7 @@ namespace SensorDataProcessor
                 ["adaptive"] = new Dictionary<string, object>
                 {
                     ["K"] = 0.22,
-                    ["K_height"] = 0.000000005,
+                    ["K_height"] = 0.5,
                     ["distancia_picos"] = FACTOR_DISTANCIA,
                     ["dt"] = 0.02,
                     ["alpha"] = 0.57,
